@@ -13,7 +13,6 @@ Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
 Patch0:		jbigkit-1.6-build.patch
 Patch1:		jbigkit-1.6-respect-make.patch
 Patch2:		jbigkit-shared.diff
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
 
 %description
 JBIG-KIT implements a highly effective data compression algorithm for bi-level
