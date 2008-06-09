@@ -91,9 +91,13 @@ ln -snf libjbig.so.0.0 %{buildroot}%{_libdir}/libjbig.so
 install -m0644 libjbig/libjbig.a %{buildroot}%{_libdir}
 install -m0644 libjbig/jbig.h %{buildroot}%{_includedir}
 
+%if %mdkversion < 200900
 %post -n %{libname} -p /sbin/ldconfig
+%endif
 
+%if %mdkversion < 200900
 %postun -n %{libname} -p /sbin/ldconfig
+%endif
 
 %clean
 rm -rf %{buildroot}
