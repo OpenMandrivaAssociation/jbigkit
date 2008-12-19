@@ -5,7 +5,7 @@
 Summary:	The JBIG-KIT
 Name:		jbigkit
 Version:	1.6
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		Graphics
 URL:		http://www.cl.cam.ac.uk/~mgk25
@@ -63,7 +63,8 @@ find . -type f -perm 0444 -exec chmod 644 {} \;
 %patch2 -p1
 
 %build
-make CFLAGS="%{optflags} -fPIC -DPIC -I../libjbig"
+export LDFLAGS="`rpm --eval %%configure|grep LDFLAGS|cut -d\\" -f2|sed -e 's/\$LDFLAGS\ //'`"
+make CFLAGS="%{optflags} -fPIC -DPIC -I../libjbig" LDFLAGS="$LDFLAGS"
 
 make test
 
