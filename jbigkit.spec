@@ -5,7 +5,7 @@
 Summary:	The JBIG-KIT
 Name:		jbigkit
 Version:	1.6
-Release:	%mkrel 4
+Release:	%mkrel 5
 License:	GPL
 Group:		Graphics
 URL:		http://www.cl.cam.ac.uk/~mgk25
@@ -13,7 +13,7 @@ Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
 Patch0:		jbigkit-1.6-build.patch
 Patch1:		jbigkit-1.6-respect-make.patch
 Patch2:		jbigkit-shared.diff
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 JBIG-KIT implements a highly effective data compression algorithm for bi-level
@@ -63,8 +63,7 @@ find . -type f -perm 0444 -exec chmod 644 {} \;
 %patch2 -p1
 
 %build
-export LDFLAGS="`rpm --eval %%configure|grep LDFLAGS|cut -d\\" -f2|sed -e 's/\$LDFLAGS\ //'`"
-make CFLAGS="%{optflags} -fPIC -DPIC -I../libjbig" LDFLAGS="$LDFLAGS"
+make CFLAGS="%{optflags} -fPIC -DPIC -I../libjbig" LDFLAGS="%ldflags"
 
 make test
 
