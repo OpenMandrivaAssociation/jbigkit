@@ -1,18 +1,17 @@
-%define	major 0
+%define	major 1
 %define libname %mklibname jbig %{major}
 %define develname %mklibname jbig -d
 
 Summary:	The JBIG-KIT
 Name:		jbigkit
-Version:	1.6
-Release:	%mkrel 5
+Version:	2.0
+Release:	%mkrel 1
 License:	GPL
 Group:		Graphics
 URL:		http://www.cl.cam.ac.uk/~mgk25
 Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
-Patch0:		jbigkit-1.6-build.patch
-Patch1:		jbigkit-1.6-respect-make.patch
-Patch2:		jbigkit-shared.diff
+Patch0:		jbigkit-2.0-shared.diff
+BuildRequires:	libtool
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
@@ -59,37 +58,18 @@ find . -type f -perm 0555 -exec chmod 755 {} \;
 find . -type f -perm 0444 -exec chmod 644 {} \;
 
 %patch0 -p1
-%patch1 -p1
-%patch2 -p1
 
 %build
-make CFLAGS="%{optflags} -fPIC -DPIC -I../libjbig" LDFLAGS="%ldflags"
+make CFLAGS="%{optflags} -fPIC -DPIC" \
+    LDFLAGS="%{ldflags}" prefix=%{_prefix} libdir=%{_libdir}
 
+%check
 make test
-
-mv -f libjbig/jbig.doc libjbig/jbig.txt
 
 %install
 rm -rf %{buildroot}
 
-install -d %{buildroot}%{_bindir}
-install -d %{buildroot}%{_includedir}
-install -d %{buildroot}%{_libdir}
-install -d %{buildroot}%{_mandir}/man1
-install -d %{buildroot}%{_mandir}/man5
-
-install -m0755 pbmtools/jbgtopbm %{buildroot}%{_bindir}/
-install -m0755 pbmtools/pbmtojbg %{buildroot}%{_bindir}/
-
-install -m0644 pbmtools/*.1 %{buildroot}%{_mandir}/man1/
-install -m0644 pbmtools/*.5 %{buildroot}%{_mandir}/man5/
-
-install -m0755 libjbig/libjbig.so.0.0 %{buildroot}%{_libdir}/libjbig.so.0.0
-ln -snf libjbig.so.0.0 %{buildroot}%{_libdir}/libjbig.so.0
-ln -snf libjbig.so.0.0 %{buildroot}%{_libdir}/libjbig.so
-
-install -m0644 libjbig/libjbig.a %{buildroot}%{_libdir}
-install -m0644 libjbig/jbig.h %{buildroot}%{_includedir}
+%makeinstall_std prefix=%{_prefix} libdir=%{_libdir}
 
 %if %mdkversion < 200900
 %post -n %{libname} -p /sbin/ldconfig
@@ -111,11 +91,11 @@ rm -rf %{buildroot}
 %files -n %{libname}
 %defattr(-,root,root)
 %doc ANNOUNCE CHANGES COPYING
-%attr(0755,root,root) %{_libdir}/*.so.*
+%attr(0755,root,root) %{_libdir}/*.so.%{major}*
 
 %files -n %{develname}
 %defattr(-,root,root)
-%doc  INSTALL TODO libjbig/jbig.txt
+%doc INSTALL TODO pbmtools/*.txt libjbig/*.txt
 %attr(0644,root,root) %{_includedir}/*.h
 %attr(0644,root,root) %{_libdir}/*.so
-%attr(0644,root,root) %{_libdir}/*.a
+%attr(0644,root,root) %{_libdir}/*.*a
