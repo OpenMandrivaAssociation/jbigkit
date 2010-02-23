@@ -8,7 +8,7 @@ Version:	2.0
 Release:	%mkrel 3
 License:	GPL
 Group:		Graphics
-URL:		http://www.cl.cam.ac.uk/~mgk25
+URL:		http://www.cl.cam.ac.uk/~mgk25/jbigkit/
 Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
 Patch0:		jbigkit-2.0-shared.diff
 BuildRequires:	libtool
