@@ -5,14 +5,13 @@
 Summary:	The JBIG-KIT
 Name:		jbigkit
 Version:	2.0
-Release:	%mkrel 6
+Release:	7
 License:	GPL
 Group:		Graphics
 URL:		http://www.cl.cam.ac.uk/~mgk25/jbigkit/
 Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
 Patch0:		jbigkit-2.0-shared.diff
 BuildRequires:	libtool
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 JBIG-KIT implements a highly effective data compression algorithm for bi-level
@@ -71,31 +70,19 @@ rm -rf %{buildroot}
 
 %makeinstall_std prefix=%{_prefix} libdir=%{_libdir}
 
-%if %mdkversion < 200900
-%post -n %{libname} -p /sbin/ldconfig
-%endif
-
-%if %mdkversion < 200900
-%postun -n %{libname} -p /sbin/ldconfig
-%endif
-
-%clean
-rm -rf %{buildroot}
+# cleanup
+rm -f %{buildroot}%{_libdir}/*.*a
 
 %files
-%defattr(-,root,root)
 %attr(0755,root,root) %{_bindir}/*
 %attr(0644,root,root) %{_mandir}/man1/*
 %attr(0644,root,root) %{_mandir}/man5/*
 
 %files -n %{libname}
-%defattr(-,root,root)
 %doc ANNOUNCE CHANGES COPYING
 %attr(0755,root,root) %{_libdir}/*.so.%{major}*
 
 %files -n %{develname}
-%defattr(-,root,root)
 %doc INSTALL TODO pbmtools/*.txt libjbig/*.txt
 %attr(0644,root,root) %{_includedir}/*.h
 %attr(0644,root,root) %{_libdir}/*.so
-%attr(0644,root,root) %{_libdir}/*.*a
