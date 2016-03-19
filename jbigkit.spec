@@ -6,7 +6,7 @@
 Summary:	The JBIG-KIT
 Name:		jbigkit
 Version:	2.0
-Release:	19
+Release:	20
 License:	GPLv2
 Group:		Graphics
 Url:		http://www.cl.cam.ac.uk/~mgk25/jbigkit/
