@@ -1,18 +1,23 @@
-%define major	1
+%define major	2
 %define libname	%mklibname jbig %{major}
 %define lib85	%mklibname jbig 85 %{major}
 %define devname	%mklibname jbig -d
 
 Summary:	The JBIG-KIT
 Name:		jbigkit
-Version:	2.0
-Release:	23
+Version:	2.1
+Release:	1
 License:	GPLv2
 Group:		Graphics
 Url:		http://www.cl.cam.ac.uk/~mgk25/jbigkit/
 Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
-Patch0:		jbigkit-2.0-shared.diff
 BuildRequires:	libtool
+
+Patch0:         jbigkit-2.1-shlib.patch
+Patch1:         jbigkit-2.0-warnings.patch
+Patch2:         jbigkit-ldflags.patch
+# patch for coverity issues - backported from upstream
+Patch3:         jbigkit-covscan.patch
 
 %description
 JBIG-KIT implements a highly effective data compression algorithm for bi-level
@@ -46,7 +51,7 @@ This package is only needed if you plan to develop or compile applications
 which requires the libjbig library.
 
 %prep
-%setup -qn %{name}
+%setup -q
 %apply_patches
 
 # fix strange perms
@@ -56,6 +61,7 @@ find . -type f -perm 0444 -exec chmod 644 {} \;
 
 %build
 make \
+	CC=%{__cc} \
 	CFLAGS="%{optflags} -fPIC -DPIC" \
 	LDFLAGS="%{ldflags}" \
 	prefix=%{_prefix} \
@@ -65,8 +71,23 @@ make \
 make test
 
 %install
-%makeinstall_std prefix=%{_prefix} libdir=%{_libdir}
+mkdir -p $RPM_BUILD_ROOT%{_libdir}
+mkdir -p $RPM_BUILD_ROOT%{_includedir}
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
 
+install -p -m0755 libjbig/libjbig.so.%{version} $RPM_BUILD_ROOT/%{_libdir}
+install -p -m0755 libjbig/libjbig85.so.%{version} $RPM_BUILD_ROOT/%{_libdir}
+ln -sf libjbig.so.%{version} $RPM_BUILD_ROOT/%{_libdir}/libjbig.so
+ln -sf libjbig85.so.%{version} $RPM_BUILD_ROOT/%{_libdir}/libjbig85.so
+
+install -p -m0644 libjbig/jbig.h $RPM_BUILD_ROOT%{_includedir}
+install -p -m0644 libjbig/jbig85.h $RPM_BUILD_ROOT%{_includedir}
+install -p -m0644 libjbig/jbig_ar.h $RPM_BUILD_ROOT%{_includedir}
+
+install -p -m0755 pbmtools/???to??? $RPM_BUILD_ROOT%{_bindir}
+install -p -m0755 pbmtools/???to???85 $RPM_BUILD_ROOT%{_bindir}
+install -p -m0644 pbmtools/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
 # cleanup
 rm -f %{buildroot}%{_libdir}/*.a
 
@@ -74,7 +95,6 @@ rm -f %{buildroot}%{_libdir}/*.a
 %doc ANNOUNCE CHANGES COPYING
 %{_bindir}/*
 %{_mandir}/man1/*
-%{_mandir}/man5/*
 
 %files -n %{libname}
 %{_libdir}/libjbig.so.%{major}*
@@ -86,4 +106,3 @@ rm -f %{buildroot}%{_libdir}/*.a
 %doc INSTALL TODO pbmtools/*.txt libjbig/*.txt
 %{_includedir}/*.h
 %{_libdir}/*.so
-
