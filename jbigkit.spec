@@ -51,8 +51,7 @@ This package is only needed if you plan to develop or compile applications
 which requires the libjbig library.
 
 %prep
-%setup -q
-%apply_patches
+%autosetup -p1
 
 # fix strange perms
 find . -type d -perm 0700 -exec chmod 755 {} \;
@@ -60,7 +59,7 @@ find . -type f -perm 0555 -exec chmod 755 {} \;
 find . -type f -perm 0444 -exec chmod 644 {} \;
 
 %build
-make \
+%make_build \
 	CC=%{__cc} \
 	CFLAGS="%{optflags} -fPIC -DPIC" \
 	LDFLAGS="%{ldflags}" \
