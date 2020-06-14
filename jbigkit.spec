@@ -1,12 +1,23 @@
+# jbigkit is used by ghostscript, ghostscript is used by libspectre,
+# libspectre is used by cairo, cairo is used by gtk-3.0, gtk-3.0
+# is used by wine
+%ifarch %{x86_64}
+%bcond_without compat32
+%endif
+
 %define major	2
 %define libname	%mklibname jbig %{major}
 %define lib85	%mklibname jbig 85 %{major}
 %define devname	%mklibname jbig -d
 
+%define lib32name	%mklib32name jbig %{major}
+%define lib3285	%mklib32name jbig 85 %{major}
+%define dev32name	%mklib32name jbig -d
+
 Summary:	The JBIG-KIT
 Name:		jbigkit
 Version:	2.1
-Release:	1
+Release:	2
 License:	GPLv2
 Group:		Graphics
 Url:		http://www.cl.cam.ac.uk/~mgk25/jbigkit/
@@ -50,6 +61,33 @@ Provides:	%{name}-devel = %{version}-%{release}
 This package is only needed if you plan to develop or compile applications
 which requires the libjbig library.
 
+%if %{with compat32}
+%package -n	%{lib32name}
+Summary:	The Shared library for The JBIG-KIT (32-bit)
+Group:		System/Libraries
+
+%description -n	%{lib32name}
+This package provides the shared JBIG-KIT library.
+
+%package -n	%{lib3285}
+Summary:	The Shared library for The JBIG-KIT (32-bit)
+Group:		System/Libraries
+
+%description -n	%{lib3285}
+This package provides the shared JBIG-KIT library.
+
+%package -n	%{dev32name}
+Summary:	Development library and header files for development with JBIG-KIT (32-bit)
+Group:		Development/C
+Requires:	%{devname} = %{EVRD}
+Requires:	%{lib32name} = %{version}-%{release}
+Requires:	%{lib3285} = %{version}-%{release}
+
+%description -n	%{dev32name}
+This package is only needed if you plan to develop or compile applications
+which requires the libjbig library.
+%endif
+
 %prep
 %autosetup -p1
 
@@ -59,6 +97,19 @@ find . -type f -perm 0555 -exec chmod 755 {} \;
 find . -type f -perm 0444 -exec chmod 644 {} \;
 
 %build
+%if %{with compat32}
+%make_build \
+	CC="gcc -m32" \
+	CFLAGS="%(echo %{optflags} |sed -e 's,-m64,,;s,-flto,,g') -m32 -fPIC -DPIC" \
+	LDFLAGS="%(echo %{ldflags} |sed -e 's,-m64,,;s,-flto,,g') -m32" \
+	prefix=%{_prefix} \
+	libdir=%{_libdir}
+
+mkdir lib32
+mv libjbig/*.so* lib32
+make clean
+%endif
+
 %make_build \
 	CC=%{__cc} \
 	CFLAGS="%{optflags} -fPIC -DPIC" \
@@ -74,6 +125,13 @@ mkdir -p $RPM_BUILD_ROOT%{_libdir}
 mkdir -p $RPM_BUILD_ROOT%{_includedir}
 mkdir -p $RPM_BUILD_ROOT%{_bindir}
 mkdir -p $RPM_BUILD_ROOT%{_mandir}/man1
+%if %{with compat32}
+mkdir -p %{buildroot}%{_prefix}/lib
+install -p -m0755 lib32/libjbig.so.%{version} $RPM_BUILD_ROOT/%{_prefix}/lib
+install -p -m0755 lib32/libjbig85.so.%{version} $RPM_BUILD_ROOT/%{_prefix}/lib
+ln -sf libjbig.so.%{version} $RPM_BUILD_ROOT/%{_prefix}/lib/libjbig.so
+ln -sf libjbig85.so.%{version} $RPM_BUILD_ROOT/%{_prefix}/lib/libjbig85.so
+%endif
 
 install -p -m0755 libjbig/libjbig.so.%{version} $RPM_BUILD_ROOT/%{_libdir}
 install -p -m0755 libjbig/libjbig85.so.%{version} $RPM_BUILD_ROOT/%{_libdir}
@@ -105,3 +163,14 @@ rm -f %{buildroot}%{_libdir}/*.a
 %doc INSTALL TODO pbmtools/*.txt libjbig/*.txt
 %{_includedir}/*.h
 %{_libdir}/*.so
+
+%if %{with compat32}
+%files -n %{lib32name}
+%{_prefix}/lib/libjbig.so.%{major}*
+
+%files -n %{lib3285}
+%{_prefix}/lib/libjbig85.so.%{major}*
+
+%files -n %{dev32name}
+%{_prefix}/lib/*.so
+%endif
