@@ -20,7 +20,7 @@ Version:	2.1
 Release:	3
 License:	GPLv2
 Group:		Graphics
-Url:		http://www.cl.cam.ac.uk/~mgk25/jbigkit/
+Url:		https://www.cl.cam.ac.uk/~mgk25/jbigkit/
 Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
 BuildRequires:	libtool
 
