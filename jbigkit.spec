@@ -22,6 +22,7 @@ License:	GPLv2
 Group:		Graphics
 Url:		https://www.cl.cam.ac.uk/~mgk25/jbigkit/
 Source0:	http://www.cl.cam.ac.uk/~mgk25/download/%{name}-%{version}.tar.gz
+BuildRequires:	make
 BuildRequires:	libtool
 
 Patch0:         jbigkit-2.1-shlib.patch
